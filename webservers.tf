@@ -15,15 +15,16 @@ resource "digitalocean_droplet" "web" {
 
     tags = ["${var.name}-webserver"]
 
-    user_data = <<EOF
-    #cloud-config
-    packages:
-        - nginx
-        - postgresql
-        - postgresql-contrib
-    runcmd:
-        - [sh, -xc, "echo '<h1>web-${var.region}-${count.index + 1}</h1>' >> var/www/html/index.html"]
-    EOF
+    # user_data = <<EOF
+    # #cloud-config
+    # packages:
+    #     - nginx
+    #     - postgresql
+    #     - postgresql-contrib
+    # runcmd:
+    #     - [sh, -xc, "echo '<h1>web-${var.region}-${count.index + 1}</h1>' >> var/www/html/index.html"]
+    # EOF
+    user_data = data.cloudinit_config.server_config.rendered
 
     lifecycle {
         create_before_destroy = true
