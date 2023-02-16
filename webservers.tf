@@ -24,7 +24,42 @@ resource "digitalocean_droplet" "web" {
     # runcmd:
     #     - [sh, -xc, "echo '<h1>web-${var.region}-${count.index + 1}</h1>' >> var/www/html/index.html"]
     # EOF
-    user_data = data.cloudinit_config.server_config.rendered
+    # user_data = data.cloudinit_config.server_config.rendered
+
+    lifecycle {
+        create_before_destroy = true
+    }
+}
+
+resource "digitalocean_droplet" "test-droplet" {
+    count = var.droplet_count
+
+    image = var.image
+    
+    name = "web-${var.name}-${var.region}-${count.index + 1}"
+
+    region = var.region
+    
+    size = var.droplet_size
+
+    ssh_keys = [data.digitalocean_ssh_key.kaan.id, data.digitalocean_ssh_key.can.id]
+
+    tags = ["${var.name}-webserver"]
+
+    # user_data = data.cloudinit_config.server_config.rendered
+    user_data = templatefile("${path.module}/cloud-config.yaml", {
+        nginx-config: data.local_file.nginx_config.content,
+        region: var.region,
+    })
+    # user_data = <<EOF
+    # #cloud-config
+    # packages:
+    #     - nginx
+    #     - postgresql
+    #     - postgresql-contrib
+    # runcmd:
+    #     - [sh, -xc, "echo '<h1>web-${var.region}-${count.index + 1}</h1>' >> var/www/html/index.html"]
+    # EOF
 
     lifecycle {
         create_before_destroy = true

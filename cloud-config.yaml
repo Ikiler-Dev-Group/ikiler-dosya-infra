@@ -4,7 +4,7 @@ users:
     shell: /bin/bash
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
     groups: sudo
-disable_root: true
+# disable_root: true
 packages:
   - nginx
 write_files:
