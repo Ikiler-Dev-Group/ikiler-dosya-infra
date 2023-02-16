@@ -1,0 +1,15 @@
+#cloud-config
+users:
+  - name: app-manager
+    shell: /bin/bash
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    groups: sudo
+# disable_root: true
+packages:
+  - nginx
+write_files:
+  - path: /etc/nginx/nginx.conf
+    content: "${nginx-config}"
+runcmd:
+  - rsync --archive --chown=app-manager:app-manager ~/.ssh /home/app-manager
+  - [sh, -xc, "echo '<h1>web-${region}</h1>' >> var/www/html/index.html"]
